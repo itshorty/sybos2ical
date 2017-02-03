@@ -32,22 +32,24 @@ public class TheMain {
 				.isRequired(false).create("out"));
 		try {
 			CommandLine line = new DefaultParser().parse(options, args);
-			
+
 			OutputStream out = System.out;
-			if(line.hasOption("out")){
-				File outputfile = new File (line.getOptionValue("out"));
-				if(outputfile.exists()){
+			if (line.hasOption("out")) {
+				File outputfile = new File(line.getOptionValue("out"));
+				if (outputfile.exists()) {
 					outputfile.delete();
 				}
 				outputfile.createNewFile();
-				out=new FileOutputStream(outputfile);
+				out = new FileOutputStream(outputfile);
 			}
-			
+
 			String baseURL = AppProperties.getInstance().getProperty("sybos.baseurl");
 			String token = AppProperties.getInstance().getProperty("sybos.token");
+			String descFormat = AppProperties.getInstance().getProperty("sybos.ical.format");
 			boolean loadFuture = Boolean
-					.parseBoolean(AppProperties.getInstance().getProperty("sybos.loadfuture", "true"));
-			boolean loadPast = Boolean.parseBoolean(AppProperties.getInstance().getProperty("sybos.loadpast", "false"));
+					.parseBoolean(AppProperties.getInstance().getProperty("sybos.ical.loadfuture", "true"));
+			boolean loadPast = Boolean
+					.parseBoolean(AppProperties.getInstance().getProperty("sybos.ical.loadpast", "false"));
 
 			if (StringUtils.isEmpty(baseURL)) {
 				logger.error("SYBOS Baseurl (sybos.baseurl) not set - aborting");
@@ -62,18 +64,19 @@ public class TheMain {
 				logger.debug("sybos2ical config:");
 				logger.debug("sybos.baseurl=" + baseURL);
 				logger.debug("sybos.token=" + token);
-				logger.debug("sybos.loadFuture=" + loadFuture);
-				logger.debug("sybos.loadPast=" + loadPast);
+				logger.debug("sybos.ical.format=" + descFormat);
+				logger.debug("sybos.ical.loadFuture=" + loadFuture);
+				logger.debug("sybos.ical.loadPast=" + loadPast);
 			}
 
 			SybosFuturePastEventClient sec = new SybosFuturePastEventClient(baseURL, token);
 			sec.setLoadPast(loadPast);
 			sec.setLoadFuture(loadFuture);
 
-			Sybos2Ical sybos2ical = new Sybos2Ical(sec);
+			Sybos2Ical sybos2ical = new Sybos2Ical(sec, descFormat);
 
 			ICalendar ical = sybos2ical.loadAndConvert();
-		
+
 			ical.write(out);
 
 		} catch (SybosClientException e) {

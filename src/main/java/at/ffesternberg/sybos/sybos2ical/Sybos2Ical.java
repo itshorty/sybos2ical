@@ -66,9 +66,106 @@ public class Sybos2Ical {
 			String description = PlaceholderStringFormater.getInstance().replace(descriptionString, values);
 
 			vevent.setDescription(description);
+
+			vevent.addCategories(getCategory(sybosEvent));
 			cal.addEvent(vevent);
 		}
 		return cal;
 	}
 
+	private String getCategory(Event event) {
+		// Ausbildung
+		if (event.getReferat().equals("Feuerwehrausbildung Aktive") || event.getReferat().equals("Fachweiterbildung") || event.getReferat().equals("Überprüfung (Mannschaft)")) {
+			// Grundausbildung
+			if (event.getBezeichnung1().equals("SO: Grundausbildung")) {
+				return "Grundausbildung";
+			}
+			if (event.getBezeichnung1().equals("Atemschutz-Leistungstest")){
+				return "ASLT";
+			}
+			return "Ausbildung";
+		}
+		// Jugend
+		if (event.getReferat().equals("Jugendarbeit")) {
+			return "Jugend";
+		}
+		// Bewerbe
+		if (stripVorbereitung(event.getReferat()).equals("Bewerb & Leistungsprüfung")) {
+			// FjLA
+			if (stripVorbereitung(event.getBezeichnung1()).startsWith("FjLA")) {
+				return "FjLA";
+			}
+			// Wissenstest
+			if (stripVorbereitung(event.getBezeichnung1()).startsWith("FjWT")) {
+				return "Wissenstest";
+			}
+			// FLA
+			if (stripVorbereitung(event.getBezeichnung1()).startsWith("FLA")) {
+				return "FLA";
+			}
+			// THL
+			if (stripVorbereitung(event.getBezeichnung1()).startsWith("THL")) {
+				return "THL";
+			}
+			// ASLP
+			if (stripVorbereitung(event.getBezeichnung1()).startsWith("ASLP")) {
+				return "ASLP";
+			}
+			// FuLA
+			if (stripVorbereitung(event.getBezeichnung1()).startsWith("FuLA")) {
+				return "FuLA";
+			}
+			// WLA
+			if (stripVorbereitung(event.getBezeichnung1()).startsWith("WLA")) {
+				return "WLA";
+			}
+			return "Bewerb";
+		}		
+		// SvE
+		if (event.getReferat().equals("Betreung (SvE)")) {
+			return "SvE";
+		}
+		// Kommando
+		if (catMatches(event, "Organisation", "Dienstbesprechung (Sitzung)")
+				|| catMatches(event, "Organisation", "Inspektion")
+				|| catMatches(event, "Organisation", "Landesfeuerwehrtag")) {
+			return "Kommando";
+		}
+		// Arbeitstag
+		if (catMatches(event, "Organisation", "Arbeitstag")){
+			return "Arbeitstag";
+		}
+		// Feste
+		if (catMatches(event, "Organisation", "Feuerwehrfest / -ball")){
+			return "Feste";
+		}
+		// Ausrückung
+		if (	catMatches(event, "Organisation", "Sonstige Ausrückung")||
+				catMatches(event, "Organisation", "Kirchenausrückung")){
+			return "Ausrückung";
+		}
+		// Versammlung
+		if (catMatches(event, "Organisation", "Vollversammlung")||
+				catMatches(event, "Organisation", "Wahlveranstaltung")||
+				catMatches(event, "Organisation", "Mitgliederversammlung")){
+			return "Versammlung";
+		}
+		// Veranstaltung
+		if (catMatches(event, "Organisation", "Sonstige Veranstaltung")||
+				catMatches(event, "Organisation", "Ausflug")){
+			return "Veranstaltung";
+		}
+		return "Sonstiges";
+	}
+
+	private String stripVorbereitung(String category) {
+		if (category.startsWith("Vorbereitung ")) {
+			return category.substring("Vorbereitung ".length());
+		}
+		return category;
+	}
+
+	private boolean catMatches(Event event, String referat, String beschreibung1) {
+		return event.getReferat().equals(referat) && event.getBezeichnung1().matches(beschreibung1);
+	}
 }
