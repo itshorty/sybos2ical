@@ -46,6 +46,7 @@ public class TheMain {
 			String baseURL = AppProperties.getInstance().getProperty("sybos.baseurl");
 			String token = AppProperties.getInstance().getProperty("sybos.token");
 			String descFormat = AppProperties.getInstance().getProperty("sybos.ical.format");
+			int count = Integer.parseInt(AppProperties.getInstance().getProperty("sybos.count", "60"));
 			boolean loadFuture = Boolean
 					.parseBoolean(AppProperties.getInstance().getProperty("sybos.ical.loadfuture", "true"));
 			boolean loadPast = Boolean
@@ -64,6 +65,7 @@ public class TheMain {
 				logger.debug("sybos2ical config:");
 				logger.debug("sybos.baseurl=" + baseURL);
 				logger.debug("sybos.token=" + token);
+				logger.debug("sybos.count=" + count);
 				logger.debug("sybos.ical.format=" + descFormat);
 				logger.debug("sybos.ical.loadFuture=" + loadFuture);
 				logger.debug("sybos.ical.loadPast=" + loadPast);
@@ -72,6 +74,7 @@ public class TheMain {
 			SybosFuturePastEventClient sec = new SybosFuturePastEventClient(baseURL, token);
 			sec.setLoadPast(loadPast);
 			sec.setLoadFuture(loadFuture);
+			sec.setCount(count);
 
 			Sybos2Ical sybos2ical = new Sybos2Ical(sec, descFormat);
 
