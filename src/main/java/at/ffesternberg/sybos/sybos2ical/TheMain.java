@@ -12,6 +12,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +81,8 @@ public class TheMain {
 
 			ICalendar ical = sybos2ical.loadAndConvert();
 
+			logger.info("Loaded " + ical.getEvents().size() + " Events!");
+
 			ical.write(out);
 
 		} catch (SybosClientException e) {
@@ -95,7 +98,7 @@ public class TheMain {
 			logger.error("General I/O Error!", e);
 			System.exit(-2);
 		}
-
+		logger.info("Exit");
 	}
 
 }
